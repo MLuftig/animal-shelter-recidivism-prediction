@@ -59,11 +59,14 @@ pip install -r requirements.txt
 ### Usage
 Run the pipeline files from your terminal:
 ```bash
-# Run data cleaning script
-python src/data_cleaning.py
+# Step 1: Extract and clean raw data records
+python src/recidivism_data_extraction.py
 
-# Run model training
-python src/train.py
+# Step 2: Perform SQL joining and feature transformation
+python src/recidivism_data_engineering.py
+
+# Step 3: Execute statistical exploration and train Random Forest model
+python src/recidivism_model_and_evaluation.py
 ```
 
 ## License & Contact
