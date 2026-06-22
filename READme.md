@@ -47,12 +47,14 @@ Model optimization intentionally prioritized Recall over strict global Accuracy.
 * **True Positives:** 340 animals correctly flagged as high return risks.
 * **False Negatives:** 217 animals missed by the model. Future iterations will focus on reducing this number further by experimenting with gradient boosting methods.
 
-### Project Directory Structure
-```text
+### Project Directory Structure:
+```
 ├── data/               # Raw and processed datasets
-├── notebooks/          # Jupyter notebooks for EDA and modeling
-├── src/                # Python scripts for data cleaning and training
-├── requirements.txt    # Library dependencies
+├── src/                # Modular Python production scripts
+│   ├── recidivism_data_extraction.py
+│   ├── recidivism_data_engineering.py
+│   └── recidivism_model_and_evaluation.py
+├── requirements.txt    # Unified library dependencies
 └── README.md
 ```
 
