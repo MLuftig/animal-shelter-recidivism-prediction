@@ -1,8 +1,9 @@
 # Data-Driven Insights into Animal Shelter Recidivism: Predicting Pet Returns at Austin Animal Center
 
 <!-- Badges for quick overview -->
-![Python](https://shields.io)
-![License](https://shields.io)
+[![Python](https://shields.io)](https://python.org)
+[![License](https://shields.io)](https://opensource.org)
+
 
 ## Executive Summary
 Animal shelter data from the Austin, TX area was cleaned and examined with the intention of reducing recidivism. This project applies Random Forest classification models to identify the key risk factors that lead to pets being returned to the shelter within 30 days of adoption.
