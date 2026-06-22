@@ -71,4 +71,4 @@ python src/recidivism_model_and_evaluation.py
 ```
 
 ## License & Contact
-Distributed under the MIT License. For questions or collaboration, reach out via [Your LinkedIn Link].
+Distributed under the MIT License. For questions or collaboration, reach out via [[LinkedIn](https://www.linkedin.com/in/micah-luftig/)].
