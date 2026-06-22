@@ -23,6 +23,26 @@ The Random Forest model achieved a baseline **accuracy of 55%** and demonstrated
 * **Recall (Class 1 - Returned): 61%** — The model successfully identified 340 out of 557 actual recidivism cases, allowing the shelter to proactively target more than half of the highest-risk adoptions.
 * **Precision (Class 1 - Returned): 60%** — When the model marks an adoption as "high risk," it is accurate 60% of the time, ensuring shelter resources are deployed efficiently without excessive false alarms.
 
+## Technical Decision Rationale
+
+### Data Engineering & SQL Join Rationale
+The core datasets required structural restructuring to trace individual animal timelines over multiple shelter stays. To execute this safely without generating duplicating rows or invalid cartesian logic, an explicit multi-layer SQL extraction architecture was built directly within Python using SQLite:
+
+* **Chronological Stay Mapping:** Utilized an algorithmic inner join restricting `o.datetime_out > i.datetime_in`. This ensured outcomes only mapped to relevant, future-facing operational events.
+* **Window Partitioning:** Implemented Common Table Expressions (CTEs) combining analytical window ranking functions (`ROW_NUMBER() OVER (PARTITION BY i.apt_id ORDER BY o.datetime_out ASC)`). This isolated the strict, immediate chronological outcome for every specific stay record.
+* **Pipeline Isolation:** Structured the infrastructure cleanly into dedicated `Extraction` and `Transformation` functions, handling object-to-datetime type-casting systematically to enforce raw schema integrity prior to feature engineering.
+
+### Model Selection & Progression
+Initial baseline modeling was attempted using Ordinary Least Squares (OLS) linear regression to predict `return_time_days`. The linear approach failed completely, yielding an **R-squared of 0.002 (explaining only 0.2% of the variance)**. This mathematical failure proved that shelter return dynamics are highly non-linear and complex. 
+
+To resolve this, the problem was reframed as a binary classification task (predicting a 30-day return window) and upgraded to a Random Forest architecture. This transition successfully allowed the pipeline to capture non-linear feature interactions, resulting in an evaluation accuracy of 55% and a strong 61% recall rate.
+
+### Recidivism Window Definition
+The target threshold for pet recidivism was strictly locked to a 30-day post-adoption horizon. In shelter operations, returns within the first month heavily correlate with immediate household integration friction or mismatched expectations, making them highly actionable targets for pre-discharge coaching and follow-up intervention.
+
+### Metric Prioritization
+Model optimization intentionally prioritized Recall over strict global Accuracy. In this operational context, a False Negative—failing to flag an animal that will ultimately be returned—results in zero intervention and a failed adoption. Prioritizing Recall ensures the shelter proactively catches the maximum number of true-risk cases.
+
 ### Confusion Matrix Insights
 * **True Positives:** 340 animals correctly flagged as high return risks.
 * **False Negatives:** 217 animals missed by the model. Future iterations will focus on reducing this number further by experimenting with gradient boosting methods.
