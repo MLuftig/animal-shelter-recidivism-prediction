@@ -32,7 +32,7 @@ The core datasets required structural restructuring to trace individual animal t
 * **Window Partitioning:** Implemented Common Table Expressions (CTEs) combining analytical window ranking functions (`ROW_NUMBER() OVER (PARTITION BY i.apt_id ORDER BY o.datetime_out ASC)`). This isolated the strict, immediate chronological outcome for every specific stay record.
 * **Pipeline Isolation:** Structured the infrastructure cleanly into dedicated `Extraction` and `Transformation` functions, handling object-to-datetime type-casting systematically to enforce raw schema integrity prior to feature engineering.
 
-### Model Selection & Progression
+* ### Model Selection & Progression
 Initial baseline modeling was attempted using Ordinary Least Squares (OLS) linear regression to predict `return_time_days`. The linear approach failed completely, yielding an **R-squared of 0.002 (explaining only 0.2% of the variance)**. This mathematical failure proved that shelter return dynamics are highly non-linear and complex. 
 
 To resolve this, the problem was reframed as a binary classification task (predicting a 30-day return window) and upgraded to a Random Forest architecture. This transition successfully allowed the pipeline to capture non-linear feature interactions, resulting in an evaluation accuracy of 55% and a strong 61% recall rate.
@@ -48,8 +48,11 @@ Model optimization intentionally prioritized Recall over strict global Accuracy.
 * **False Negatives:** 217 animals missed by the model. Future iterations will focus on reducing this number further by experimenting with gradient boosting methods.
 
 ### Project Directory Structure:
-```
+```text
 ├── data/               # Raw and processed datasets
+├── images/             # Generated analytical visualizations
+│   ├── shelter_recidivism_confusion_matrix.png
+│   └── shelter_return_risk_tipping_point_by_length_of_stay.png
 ├── src/                # Modular Python production scripts
 │   ├── recidivism_data_extraction.py
 │   ├── recidivism_data_engineering.py
@@ -57,12 +60,12 @@ Model optimization intentionally prioritized Recall over strict global Accuracy.
 ├── requirements.txt    # Unified library dependencies
 └── README.md
 ```
-
-
 ## Key Findings & Visualizations
-<!-- TIP: Open GitHub editor, drag your Kaggle chart image files, and drop them right on the lines below! -->
 
 * **Insight 1:** Length of stay reveals a clear "Shelter Return Risk Tipping Point." Animals staying at the shelter longer face a steep, continuing upward trend in rapid return rates upon adoption.
+
+![Shelter Return Risk Tipping Point by Length of Stay](images/shelter_return_risk_tipping_point_by_length_of_stay.png)
+
 * **Insight 2:** The historical dataset is heavily unbalanced toward canines (over 81% of data), indicating that shelter interventions and prediction boundaries should primarily target dog adoption protocols.
 
 ## Getting Started & Installation
@@ -74,19 +77,3 @@ python -m venv venv
 source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 pip install -r requirements.txt
 ```
-
-### Usage
-Run the pipeline files from your terminal:
-```bash
-# Step 1: Extract and clean raw data records
-python src/recidivism_data_extraction.py
-
-# Step 2: Perform SQL joining and feature transformation
-python src/recidivism_data_engineering.py
-
-# Step 3: Execute statistical exploration and train Random Forest model
-python src/recidivism_model_and_evaluation.py
-```
-
-## License & Contact
-Distributed under the MIT License. For questions or collaboration, reach out via [[LinkedIn](https://www.linkedin.com/in/micah-luftig/)].
