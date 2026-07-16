@@ -1,15 +1,15 @@
 # Data-Driven Insights into Animal Shelter Recidivism: Predicting Pet Returns at Austin Animal Center
 
 ## Model Correction Note
-An earlier version of this project's Random Forest model measured a narrower question than it claimed to. The original target only included animals that had **already been returned**, splitting them into "fast return" (≤7.9 days) vs. "slow return" (8–30 days) — but it was described as predicting "will this adoption be returned at all," which requires true negative examples (adoptions that were never returned). That mismatch inflated the model's apparent performance, since distinguishing fast-vs-slow return timing is a much easier problem than predicting whether a return happens in the first place.
+An earlier version of this project's Random Forest model measured a narrower question than it claimed to. The original target only included animals that had **already been returned**, splitting them into "fast return" (≤7.9 days) vs. "slow return" (8–30 days) — but it was described as predicting "will this adoption be returned at all," which requires true negative examples (adoptions that were never returned). That mismatch inflated the model's apparent performance and also led to a false conclusion that length of stay was the dominant risk driver.
 
-The target has since been rebuilt from scratch as a true binary classifier — did an adopted animal return within 30 days, or not — using real negative examples and correcting for censoring (excluding adoptions too recent in the dataset to know for certain they wouldn't have returned). All results below reflect the corrected model.
+The target has since been rebuilt as a true binary classifier — did an adopted animal return within 30 days, or not — using real negative examples and correcting for censoring (excluding adoptions too recent in the dataset to know for certain they wouldn't have returned). All results below reflect the corrected model.
 
 ## Executive Summary
 Animal shelter data from the Austin, TX area was cleaned and examined with the intention of reducing recidivism. This project applies Random Forest classification to identify the key risk factors that lead to pets being returned to the shelter within 30 days of adoption.
 
 * **Business Goal:** Help shelter staff proactively identify high-risk adoptions and optimize resource allocation to prevent pet returns.
-* **Key Result:** An adopted animal's **age** and **species** are the strongest predictors of return risk — far more than length of shelter stay, which was mistakenly identified as the dominant driver in an earlier version of this model. Dogs return at roughly 2.7x the rate of cats, and return risk climbs steadily with age, independent of how long the animal was in the shelter.
+* **Key Result:** An adopted animal's **age** and **species** are the strongest predictors of return risk — far more than length of shelter stay, which was mistakenly identified as the dominant driver in an earlier version of this model. Dogs return at roughly 2.7x the rate of cats, and return risk climbs steadily with age, independent of how long the animal was in the shelter. Length of stay on its own shows no clean relationship with return risk at all.
 * **Actionable Recommendation:** Implement structured follow-up check-ins with new families during the first month, prioritizing older animals and dog adoptions specifically, where return risk is highest.
 
 ## The Data
@@ -17,7 +17,7 @@ Animal shelter data from the Austin, TX area was cleaned and examined with the i
 * **Dataset Size:** **54,408 adoption events** (true Adoption outcomes only, distinct from Return-to-Owner/Rto-Adopt), after excluding records too recent to reliably determine outcome.
 * **Base Rate:** **6.8% of adoptions (3,718) resulted in a return within 30 days.**
 * **Key Features:** `los_days` (Length of Stay), `age_at_first_visit`, `spp` (species), `akc_group` (breed group for dogs), and `first_reason` (intake condition: routine/medical/behavior/other).
-* **Species Breakdown:** k9 (32,716), fel (20,962), other/bird/livestock/wildlife (730 combined).
+* **Species Distribution:** 60.1% dog, 38.5% cat, remaining 1.3% split across other/bird/livestock/wildlife.
 
 ## Methodology & Architecture
 1. **Exploratory Data Analysis (EDA):** Investigated whether length of stay was a reliable standalone predictor of return risk. It was not — see Statistical Validation below.
@@ -29,14 +29,14 @@ Before finalizing the model's feature set, logistic regression was used to test 
 
 * **Age** is a real, independent risk factor (p < 0.001) — each additional year of age increases return odds, holding length of stay and breed constant.
 * **Species** is the strongest single effect found (p < 0.001) — dogs have roughly 2.7x the return odds of cats.
-* **Length of stay** has a real but small independent effect, and it points in the *opposite* direction from what the original (flawed-target) Random Forest suggested: once age is controlled for, longer stays are associated with slightly *lower*, not higher, return risk.
+* **Length of stay** has a real but small independent effect, and it points in the *opposite* direction from what an earlier, flawed-target model suggested: once age is controlled for, longer stays are associated with slightly *lower*, not higher, return risk.
 * **Intake reason (medical)** is associated with lower return odds relative to routine intakes (p < 0.001).
 * **Breed group** mostly doesn't differentiate risk among dogs, with one exception: toy breeds show significantly lower return odds than other groups.
 
 ## Evaluation Results
 The Random Forest model achieved **55% accuracy**, prioritizing recall to minimize missed at-risk cases:
-* **Recall (Class 1 - Returned): 76%** — the model correctly flags roughly three-quarters of adoptions that will actually be returned within 30 days.
-* **Precision (Class 1 - Returned): 11%** — given the low 6.8% base rate, most "high risk" flags will be false alarms; this is an expected and accepted tradeoff (see Metric Prioritization below), not a modeling error.
+* **Recall (Class 1 - Returned): 76%** — the model correctly flags 568 of 744 real 30-day returns in the held-out test set.
+* **Precision (Class 1 - Returned): 11%** — given the low 6.8% base rate, most "high risk" flags are false alarms; this is an expected and accepted tradeoff (see Metric Prioritization below), not a modeling error.
 * **Feature Importance:** age_at_first_visit (41%), spp_k9 (26%), los_days (18%), all other features individually under 3%.
 
 ## Technical Decision Rationale
@@ -60,9 +60,13 @@ Model optimization intentionally prioritized Recall over strict global Accuracy.
 
 ### Confusion Matrix Insights
 On a held-out test set of 10,882 adoptions (744 real returns):
-* **True Positives (approx.):** ~566 real returns correctly flagged.
-* **False Negatives (approx.):** ~178 real returns missed by the model.
-* **False Positives:** the majority of "high risk" flags — an accepted tradeoff given the model's recall-first design and the low 6.8% base rate.
+* **True Positives: 568** — real returns correctly flagged.
+* **False Negatives: 176** — real returns missed by the model.
+* **False Positives: 4,742** — the majority of "high risk" flags; an accepted tradeoff given the model's recall-first design and the low 6.8% base rate.
+* **True Negatives: 5,396**
+
+### Length of Stay Is Not a Reliable Standalone Predictor
+An earlier version of this analysis claimed length of stay showed "a steep, continuing upward trend" in return risk. Re-examined against the corrected target, this does not hold: return rate by week of stay is noisy and ranges narrowly between roughly 4% and 9%, with no clear directional trend — consistent with the logistic regression finding that LOS has only a small, slightly negative independent effect once age is controlled for. This is retained here as a documented correction, since it materially changes the project's earlier headline claim.
 
 ### Project Directory Structure:
 ```text
