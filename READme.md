@@ -5,6 +5,8 @@ An earlier version of this project's Random Forest model measured a narrower que
 
 The target has since been rebuilt as a true binary classifier — did an adopted animal return within 30 days, or not — using real negative examples and correcting for censoring (excluding adoptions too recent in the dataset to know for certain they wouldn't have returned). All results below reflect the corrected model.
 
+A second, separate issue was found after deployment: the Random Forest's `class_weight='balanced'` setting, while correct for classification, also caused `predict_proba()` to output uncalibrated values — the model's raw predicted probabilities averaged ~43% across the test set versus a true base rate of ~6.8%. This has been corrected with isotonic probability calibration (`CalibratedClassifierCV`), so the app's displayed risk percentages now reflect real-world frequencies rather than an inflated relative score.
+
 ## Executive Summary
 Animal shelter data from the Austin, TX area was cleaned and examined with the intention of reducing recidivism. This project applies Random Forest classification to identify the key risk factors that lead to pets being returned to the shelter within 30 days of adoption.
 
