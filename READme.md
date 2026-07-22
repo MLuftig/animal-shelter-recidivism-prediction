@@ -54,6 +54,8 @@ The core datasets required structural restructuring to trace individual animal t
 ### Model Selection & Progression
 A separate, standalone analysis modeled `return_time_days` (how long a return takes, *among animals that already returned*) using Ordinary Least Squares regression. This yielded an **R-squared of ~0.002**, meaning length of stay, age, species, and intake reason together explain almost none of the variance in *how fast* a return happens once one occurs. This is a distinct question from *whether* a return happens at all — the classification model above answers the latter, and is the basis for this project's actionable recommendations.
 
+A follow-up Kruskal-Wallis test on this same subset (animals that already returned) found a statistically significant, if weak, association between intake reason and return timing (chi-squared = 9.24, p = 0.026). This is consistent with the OLS result above — a real signal exists, but its practical magnitude is small, which is why intake reason alone shouldn't be read as a meaningful predictor of return speed on its own.
+
 ### Recidivism Window Definition
 The target threshold for pet recidivism is a 30-day post-adoption horizon. Adoptions within 30 days of the dataset's observed cutoff date are excluded rather than labeled as "did not return" — since a recent adoption may not have had the full 30-day window elapse yet, labeling it a negative would be a guess, not a confirmed outcome. Only adoptions with a fully-observed 30-day window are used for training and evaluation.
 
