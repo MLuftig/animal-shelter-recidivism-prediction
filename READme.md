@@ -39,7 +39,7 @@ Before finalizing the model's feature set, logistic regression was used to test 
 The Random Forest model achieved **55% accuracy**, prioritizing recall to minimize missed at-risk cases:
 * **Recall (Class 1 - Returned): 76%** — the model correctly flags 568 of 744 real 30-day returns in the held-out test set.
 * **Precision (Class 1 - Returned): 11%** — given the low 6.8% base rate, most "high risk" flags are false alarms; this is an expected and accepted tradeoff (see Metric Prioritization below), not a modeling error.
-* **Feature Importance:** age_at_first_visit (41%), spp_k9 (26%), los_days (18%), all other features individually under 3%.
+* **Feature Importance:** age_at_first_visit (58.67%), spp_k9 (20.70%), los_days (11.02%), all other features individually under 3%.
 
 ## Technical Decision Rationale
 
