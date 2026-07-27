@@ -124,6 +124,7 @@ At Austin, *who the animal is* (age, species) drives ~79% of the model's predict
 │   ├── Austin_Animal_Center_Outcomes.csv
 │   ├── X_test.csv                    # Held-out test features, for reproducibility
 │   ├── y_test.csv                    # Held-out test labels, for reproducibility
+│   ├── animal-data-1.csv             # Raw Bloomington source data
 │   └── bloomington_model_ready.csv   # Cleaned Bloomington data, Austin-schema-aligned
 ├── images/             # Generated analytical visualizations
 ├── src/                # Modular Python production scripts
