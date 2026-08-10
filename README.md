@@ -21,21 +21,21 @@ A Random Forest classifier was trained on Austin data, with a calibration step a
 
 **Feature importance (Austin):**
 
-![Austin Feature Importance](austin_feature_importance.png)
+![Austin Feature Importance](images/austin_feature_importance.png)
 
 **Performance:** 76% recall on true return cases, with a real, honest tradeoff — high recall was deliberately prioritized over precision, since a missed at-risk adoption (false negative) is operationally worse than a false alarm in this context.
 
 ## Finding 2: Cross-Shelter Generalization Test
 The Austin-trained model was tested directly against Bloomington's real data, without retraining, to see whether its learned risk factors transfer to a different, independent shelter.
 
-![Austin Model on Bloomington Data](austin_model_on_bloomington.png)
+![Austin Model on Bloomington Data](images/austin_model_on_bloomington_confusion_matrix.png)
 
 **Result:** Only partial transfer. AUC dropped from 0.7116 (Austin's own test set) to 0.6418 on Bloomington — better than random guessing, but a real, meaningful degradation. At the default 0.5 threshold, the model failed to identify almost any true Bloomington returns; even after tuning the decision threshold specifically for Bloomington, recall only reached 16%.
 
 ## Finding 3: A Bloomington-Native Model Reveals a Different Driver
 Rather than treating the AUC drop as the end of the story, a second Random Forest was trained directly on Bloomington's own data, to see whether its risk factors look different.
 
-![Bloomington Feature Importances](bloomington_feature_importance.png)
+![Bloomington Feature Importances](images/bloomington_feature_importances.png)
 
 **Result:** A genuinely different underlying pattern. Bloomington's own model achieves 74% recall — comparable to Austin's 76% — but **length of stay is the dominant driver at Bloomington (61.89%)**, with age (17.33%) and species (9.40%) playing meaningfully smaller roles. This is close to the exact opposite ranking found at Austin.
 
@@ -47,19 +47,24 @@ Two shelters, two genuinely different sets of risk factors. This isn't a modelin
 
 ## Repository Structure
 ```text
-├── data/                                              # Raw and processed datasets
+├── data/                                                        # Raw and processed datasets
 ├── images/
 │   ├── austin_feature_importance.png
-│   ├── bloomington_feature_importance.png
-│   └── austin_model_on_bloomington.png
-├── recidivism-model-and-evaluation.ipynb              # Corrected Austin model: target-leakage fix,
-│                                                          calibration, feature importance, evaluation
-├── 1-bloomington-data-extraction.ipynb                # Bloomington data cleaning and preparation
-├── 2-bloomington-cross-shelter-evaluation.ipynb        # Austin model tested directly on Bloomington data
-├── 3-bloomington-model-comparison.ipynb                # Bloomington-native model, feature importance comparison
+│   ├── bloomington_feature_importances.png
+│   └── austin_model_on_bloomington_confusion_matrix.png
+├── src/
+│   ├── recidivism-data-extraction.ipynb
+│   ├── recidivism-data-engineering.ipynb
+│   ├── recidivism-model-and-evaluation.ipynb            # Corrected Austin model: target-leakage fix,
+│   │                                                        calibration, feature importance, evaluation
+│   ├── 1-bloomington-data-extraction.ipynb
+│   ├── 2-bloomington-cross-shelter-evaluation.ipynb     # Austin model tested directly on Bloomington data
+│   └── 3-bloomington-model-comparison.ipynb             # Bloomington-native model, feature importance comparison
 ├── requirements.txt
 └── README.md
 ```
+
+**Note:** an old, duplicate `READme.md` (differently capitalized) may still exist at the repo root from an earlier upload — worth deleting so there's no ambiguity about which file is the real, current README.
 
 ## Related Projects
 This portfolio's [Pet Insurance Risk & Pricing Analysis](https://github.com/MLuftig/pet-insurance-risk-and-pricing-analysis) documents the same class of probability-calibration correction found here, applied in a completely different domain — a consistent QA practice throughout this portfolio, not a one-off catch.
