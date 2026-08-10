@@ -47,7 +47,11 @@ Two shelters, two genuinely different sets of risk factors. This isn't a modelin
 
 ## Repository Structure
 ```text
-├── data/                                                        # Raw and processed datasets
+├── data/
+│   ├── Austin_Animal_Center_Intakes.csv
+│   ├── Austin_Animal_Center_Outcomes.csv
+│   ├── animal-data-1.csv                                # Raw Bloomington intake/outcome data
+│   └── bloomington_model_ready.csv                       # Cleaned, feature-engineered Bloomington data
 ├── images/
 │   ├── austin_feature_importance.png
 │   ├── bloomington_feature_importances.png
